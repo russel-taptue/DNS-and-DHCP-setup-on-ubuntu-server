@@ -4,20 +4,41 @@ This repository provides a complete and beginner-friendly guide for installing a
 
 ---
 
-## 📌 Network Diagram
-
-<p align="center">
-  <img src="images/DNS_DHCP.svg" width="600" alt="Network Diagram"/>
-</p>
+# Table of Contents
+- [Network Diagram](#network-diagram)
+- [1. Install BIND9 DNS Server](#1-install-bind9-dns-server)
+- [2. Configure Static IP for the DNS Server](#2-configure-static-ip-for-the-dns-server)
+- [3. Configure Global Options in BIND9](#3-configure-global-options-in-bind9)
+- [4. Declare DNS Zones](#4-declare-dns-zones)
+- [5. Create Local DNS Database](#5-create-local-dns-database)
+- [6. Validate DNS Configuration](#6-validate-dns-configuration)
+- [7. Restart BIND9](#7-restart-bind9)
+- [8. Test Local DNS Resolution](#8-test-local-dns-resolution)
+- [DHCP Configuration (Kea DHCP4 Server)](#dhcp-configuration-kea-dhcp4-server)
+- [9. Configure Kea DHCP4 Server](#9-configure-kea-dhcp4-server)
+- [10. Validate DHCP Configuration](#10-validate-dhcp-configuration)
+- [11. Restart Kea DHCP4 Service](#11-restart-kea-dhcp4-service)
+- [Testing](#testing)
+  - [Test DNS Assignment](#test-dns-assignment)
+  - [Test DHCP Assignment](#test-dhcp-assignment)
+  - [DHCP Lease Database](#dhcp-lease-database)
+- [Summary](#summary)
 
 ---
 
-## 📌 1. Install BIND9 DNS Server
+## Network Diagram
+
+![Network Diagram](images/DNS_DHCP.svg)
+
+---
+
+## 1. Install BIND9 DNS Server
 
 ### Update package list
 ```bash
 sudo apt update
 ```
+
 ![Update Our Server](images/update_server.png)
 
 ### Install BIND9
@@ -29,7 +50,7 @@ sudo apt install bind9 -y
 
 ---
 
-## 📌 2. Configure Static IP for the DNS Server
+## 2. Configure Static IP for the DNS Server
 
 Edit your Netplan file:
 ```bash
@@ -45,7 +66,7 @@ sudo netplan apply
 
 ---
 
-## 📌 3. Configure Global Options in BIND9
+## 3. Configure Global Options in BIND9
 
 Edit:
 ```bash
@@ -56,7 +77,7 @@ sudo nano /etc/bind/named.conf.options
 
 ---
 
-## 📌 4. Declare DNS Zones
+## 4. Declare DNS Zones
 
 Edit:
 ```bash
@@ -67,22 +88,17 @@ sudo nano /etc/bind/named.conf.local
 
 ---
 
-## 📌 5. Create Local DNS Database
+## 5. Create Local DNS Database
 
 Create zone file:
 ```bash
 sudo nano /etc/bind/db.cyber-with-taptue.local
 ```
 
+Create reverse zone file:
 ```bash
 sudo nano /etc/bind/db.192.168.1
 ```
-
-Add DNS records such as:
-- NS  
-- A  
-- CNAME  
-- PTR  
 
 ![Local DNS Database](images/local_database_DNS.png)
 
@@ -90,7 +106,7 @@ Add DNS records such as:
 
 ---
 
-## 📌 6. Validate DNS Configuration
+## 6. Validate DNS Configuration
 
 Check BIND configuration:
 ```bash
@@ -106,7 +122,7 @@ sudo named-checkzone cyber-with-taptue.local /etc/bind/db.cyber-with-taptue.loca
 
 ---
 
-## 📌 7. Restart BIND9
+## 7. Restart BIND9
 
 ```bash
 sudo systemctl restart bind9
@@ -114,7 +130,7 @@ sudo systemctl restart bind9
 
 ---
 
-## 📌 8. Test Local DNS Resolution
+## 8. Test Local DNS Resolution
 
 Edit resolver settings:
 ```bash
@@ -138,30 +154,25 @@ sudo apt install kea-dhcp4-server -y
 
 ---
 
-## 📌 9. Configure Kea DHCP4 Server
+## 9. Configure Kea DHCP4 Server
 
 Edit main configuration file:
 ```bash
 sudo nano /etc/kea/kea-dhcp4.conf
 ```
 
-Configure:
-- Subnet  
-- Address pool  
-- Default gateway  
-- DNS servers  
-- Lease database  
-
 ![DHCP Configuration](images/DHCP_configuration.png)
 
 ---
 
-## 📌 10. Validate DHCP Configuration
+## 10. Validate DHCP Configuration
 
 Test configuration syntax:
 ```bash
 sudo kea-dhcp4 -t /etc/kea/kea-dhcp4.conf
 ```
+
+Start Kea with config:
 ```bash
 sudo kea-dhcp4 -c /etc/kea/kea-dhcp4.conf
 ```
@@ -170,7 +181,7 @@ sudo kea-dhcp4 -c /etc/kea/kea-dhcp4.conf
 
 ---
 
-## 📌 11. Restart Kea DHCP4 Service
+## 11. Restart Kea DHCP4 Service
 
 ```bash
 sudo systemctl restart kea-dhcp4-server
@@ -178,7 +189,7 @@ sudo systemctl restart kea-dhcp4-server
 
 ---
 
-# 🧪 Testing
+# Testing
 
 ## Test DNS Assignment
 
@@ -186,12 +197,14 @@ sudo systemctl restart kea-dhcp4-server
 ```cmd
 nslookup srv-dns.cyber-with-taptue.local
 ```
+
 ![DNS test on Windows](images/DNS_test_on_Windows.png)
 
 ### Linux
 ```bash
 nslookup srv-dns.cyber-with-taptue.local
 ```
+
 ![DNS test on Linux](images/DNS_test_on_Linux.png)
 
 ---
@@ -202,15 +215,18 @@ nslookup srv-dns.cyber-with-taptue.local
 ```cmd
 ipconfig /all
 ```
+
 ![DHCP test on Windows](images/DHCP_test_on_windows.png)
 
 ### Linux
 ```bash
 ip a
 ```
+
 ```bash
 cat /etc/resolv.conf
 ```
+
 ![DHCP test on Linux](images/DHCP_test_on_Linux.png)
 
 ---
@@ -218,19 +234,21 @@ cat /etc/resolv.conf
 ## DHCP Lease Database
 
 Kea DHCP lease records are stored in:
+
 ```
 /var/lib/kea/kea-leases4.csv
 ```
 
-![DHCP test on Linux](images/database_lease_DHCP.png)
+![DHCP lease database](images/database_lease_DHCP.png)
 
 ---
 
-# ✔ Summary
+# Summary
 
 This repository includes:
+
 - BIND9 installation and DNS zone setup  
 - Kea DHCP4 configuration  
 - Validation tools  
 - Testing instructions  
-- DNS & DHCP database references
+- DNS & DHCP database references  
